@@ -1,6 +1,7 @@
 var mysql = require("mysql");
 var inquirer = require("inquirer");
 
+
 var connection = mysql.createConnection({
     host: "localhost",
     port: 3306,
@@ -48,8 +49,25 @@ var connection = mysql.createConnection({
   }
 
   function viewProductSalesByDepartments() {
+var query = "SELECT * FROM departments JOIN (SELECT products.department_name, sum(products.product_sales) as product_sales_total,"
++ "sum(products.product_sales)-departments.over_head_costs as total_profit from products, departments group by department_name )" 
++ "as totalProfitTable ON departments.department_name=totalProfitTable.department_name";
+
+connection.query(query, function(err, results) {
+    if (err) throw err;
+
+    console.log(results);
+
+    for(i=0;i<results.length; i++){
+        var parseNum = parseInt(i) + 1;
+        console.log("Department ID: " + results[i].department_id + " department_name: " + results[i].department_name + " | " + "Over Head Costs: " +  results[i].over_head_costs + " | " + "department_name: "+  results[i].department_name + "   |   " + "Product total: " + results[i].product_sales_total +  "| total_profit: " + results[i].total_profit);
+    }
+    connection.end();
+
+});
 
   }
+
 
 
 

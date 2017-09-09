@@ -34,7 +34,7 @@ if(isNumber === false) {
   inquirer.prompt([{
       name: "productChoice",
       type: "input",
-      message: "What is the ID of the produt that you would like to buy?"
+      message: "What is the ID of the product that you would like to buy?"
     }, {
       name: "howMuch",
       type: "input",
