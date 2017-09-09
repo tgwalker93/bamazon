@@ -1,6 +1,8 @@
 var mysql = require("mysql");
 var inquirer = require("inquirer");
 
+
+var globalPrice;
 // create the connection information for the sql database
 var connection = mysql.createConnection({
   host: "localhost",
@@ -88,15 +90,16 @@ if(isNumber === false) {
 }
 }
 
-function fufillOrder(product, remainingQuantity, customerQuantity){
+function fufillOrder(product, remainingQuantity, customerQuantity, price){  
+
     connection.query("UPDATE products SET ? WHERE ?",[
         {
-            stock_quantity: remainingQuantity
+            stock_quantity: remainingQuantity, product_sales: customerQuantity*price
         },
 
         {
             item_id: product
-        }
+        },
     ], 
         function(err, results) {
 
@@ -112,7 +115,7 @@ function fufillOrder(product, remainingQuantity, customerQuantity){
 
         for(i=0;i<results.length; i++){
             var parseNum = parseInt(i) + 1;
-            console.log("Item ID: " + results[i].item_id + " Product Name: " + results[i].product_name + "   |   " + "Department Name: " +  results[i].department_name + "   |   " + "Price: $"+  results[i].price + "   |   " + "Stock Quantity: " + results[i].stock_quantity);
+            console.log("Item ID: " + results[i].item_id + " Product Name: " + results[i].product_name + "   |   " + "Department Name: " +  results[i].department_name + "   |   " + "Price: $"+  results[i].price + "   |   " + "Stock Quantity: " + results[i].stock_quantity + "      |      Product Sales: " + results[i].product_sales);
             var totalCost = results[i].price * customerQuantity;
             console.log("The customer spent " + totalCost + " dollars, and bought " + customerQuantity + " " + results[i].product_name + "(s)");
         }
@@ -135,8 +138,10 @@ function checkStock(product, quantity) {
         }else{
             //subtract what customer is purchasing
             var remainingQuantity = results[0].stock_quantity-quantity;
-
-            fufillOrder(product, remainingQuantity, quantity);
+            
+            console.log(results[0].price);
+            globalPrice = results[0].price;
+            fufillOrder(product, remainingQuantity, quantity, results[0].price);
         }
 
     });
@@ -149,7 +154,7 @@ function displayData() {
     
         for(i=0;i<results.length; i++){
             var parseNum = parseInt(i) + 1;
-            console.log("Item ID: " + results[i].item_id + " Product Name: " + results[i].product_name + "   |   " + "Department Name: " +  results[i].department_name + "   |   " + "Price: $"+  results[i].price + "   |   " + "Stock Quantity: " + results[i].stock_quantity);
+            console.log("Item ID: " + results[i].item_id + " Product Name: " + results[i].product_name + "   |   " + "Department Name: " +  results[i].department_name + "   |   " + "Price: $"+  results[i].price + "   |   " + "Stock Quantity: " + results[i].stock_quantity +  "    |    Product Sales: " + results[i].product_sales);
         }
         start();
     });
